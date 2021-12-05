@@ -1,0 +1,13 @@
+services:
+
+  maria_db:
+    image: "mariadb:10.7.1"
+    container_name: maria-db-student-batch
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_DATABASE: dev
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_ROOT_PASSWORD: admin

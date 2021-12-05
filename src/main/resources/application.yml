@@ -1,0 +1,21 @@
+schema:
+  name: dev
+
+spring:
+  batch:
+    initialize-schema: ALWAYS
+  datasource:
+    url: jdbc:mariadb://localhost:3306/dev
+    username: admin
+    password: admin
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MariaDBDialect
+    hibernate:
+      ddl-auto: none
+  flyway:
+    locations: classpath:db/migration
+
+batch:
+  file:
+    path: samples/sample_test.csv
