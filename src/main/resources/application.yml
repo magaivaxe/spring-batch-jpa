@@ -17,5 +17,8 @@ spring:
     locations: classpath:db/migration
 
 batch:
+  configuration:
+    chunkSize: 100
+    concurrencyLimit: 4
   file:
     path: samples/sample_test.csv

@@ -2,7 +2,7 @@ package com.mpsg.student.batch.config;
 
 import com.mpsg.student.batch.config.listener.ReaderListener;
 import com.mpsg.student.batch.config.listener.WriteListener;
-import com.mpsg.student.batch.config.reader.StudentReader;
+import com.mpsg.student.batch.config.reader.mapper.StudentLineMapper;
 import com.mpsg.student.batch.config.writer.StudentWriter;
 import com.mpsg.student.batch.entity.Student;
 import org.springframework.batch.core.Job;
@@ -10,11 +10,14 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -31,18 +34,8 @@ import java.util.Properties;
 @Configuration
 public class BatchConfiguration {
 
-  @Value("${spring.datasource.url}")
-  private String databaseUrl;
-  @Value("${spring.datasource.username}")
-  private String databaseUsername;
-  @Value("${spring.datasource.password}")
-  private String databasePassword;
-  @Value("${spring.datasource.driver-class-name}")
-  private String databaseDriver;
-  @Value("${spring.jpa.database-platform}")
-  private String databasePlatform;
-  @Value(("${schema.name}"))
-  private String schemaName;
+  @Value("${batch.configuration.concurrencyLimit}")
+  private int concurrencyLimit;
 
   @Bean
   public Job studentJob(JobBuilderFactory jobBuilderFactory,
@@ -53,43 +46,45 @@ public class BatchConfiguration {
   }
 
   @Bean
-  public TaskExecutor stepTaskExecutor() {
-    var taskExecutor = new SimpleAsyncTaskExecutor("student-batch");
-    taskExecutor.setConcurrencyLimit(4);
-    return taskExecutor;
-  }
-
-  @Bean
-  public Step studentStep(StepBuilderFactory stepBuilderFactory,
+  public Step studentStep(@Value("${batch.configuration.chunkSize}") int chunkSize,
+                          @Qualifier("studentReader") FlatFileItemReader<Student> studentReader,
+                          StepBuilderFactory stepBuilderFactory,
                           ReaderListener readerListener,
                           WriteListener writeListener,
-                          StudentReader studentReader,
                           StudentWriter studentWriter) {
     return stepBuilderFactory.get("studentStep")
-      .<Student, Student>chunk(100)
+      .<Student, Student>chunk(chunkSize)
       .reader(studentReader).faultTolerant().skip(Exception.class).skipLimit(Integer.MAX_VALUE)
       .listener(readerListener)
       .writer(studentWriter).faultTolerant().skip(Exception.class).skipLimit(Integer.MAX_VALUE)
       .listener(writeListener)
       .taskExecutor(stepTaskExecutor())
-      .throttleLimit(4)
+      .throttleLimit(concurrencyLimit)
       .build();
   }
 
-//  @Bean
-//  public FlatFileItemReader<Student> studentReader(StudentLineMapper studentLineMapper) {
-//    return new FlatFileItemReaderBuilder<Student>()
-//      .name("studentItemReader")
-//      .resource(new ClassPathResource("samples/sample_test.csv"))
-//      .lineMapper(studentLineMapper)
-//      .build();
-//  }
+  @Bean("studentReader")
+  public FlatFileItemReader<Student> studentReader(StudentLineMapper studentLineMapper,
+                                                   @Value("${batch.file.path}") String filePath) {
+    return new FlatFileItemReaderBuilder<Student>()
+      .name("studentItemReader")
+      .resource(new ClassPathResource(filePath))
+      .lineMapper(studentLineMapper)
+      .build();
+  }
+
+  @Bean
+  public TaskExecutor stepTaskExecutor() {
+    var taskExecutor = new SimpleAsyncTaskExecutor("student-batch");
+    taskExecutor.setConcurrencyLimit(concurrencyLimit);
+    return taskExecutor;
+  }
 
   @Bean
   public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource,
                                                                      JpaVendorAdapter jpaVendorAdapter) {
     var entityManagerFactory = new LocalContainerEntityManagerFactoryBean();
-    entityManagerFactory.setPackagesToScan("com.mpsg.student.batch");
+    entityManagerFactory.setPackagesToScan("com.mpsg.student.batch.entity");
     entityManagerFactory.setDataSource(dataSource);
     entityManagerFactory.setJpaVendorAdapter(jpaVendorAdapter);
     entityManagerFactory.setJpaProperties(new Properties());
@@ -97,7 +92,11 @@ public class BatchConfiguration {
   }
 
   @Bean
-  public DataSource dataSource() {
+  public DataSource dataSource(@Value("${spring.datasource.url}") String databaseUrl,
+                               @Value("${spring.datasource.username}") String databaseUsername,
+                               @Value("${spring.datasource.password}") String databasePassword,
+                               @Value("${spring.datasource.driver-class-name}") String databaseDriver,
+                               @Value("${schema.name}") String schemaName) {
     var dataSource = new DriverManagerDataSource();
     dataSource.setDriverClassName(databaseDriver);
     dataSource.setUrl(databaseUrl);
@@ -108,7 +107,7 @@ public class BatchConfiguration {
   }
 
   @Bean
-  public JpaVendorAdapter jpaVendorAdapter() {
+  public JpaVendorAdapter jpaVendorAdapter(@Value("${spring.jpa.database-platform}") String databasePlatform) {
     var jpaVendorAdapter = new HibernateJpaVendorAdapter();
     jpaVendorAdapter.setDatabase(Database.MYSQL);
     jpaVendorAdapter.setGenerateDdl(false);
@@ -116,6 +115,5 @@ public class BatchConfiguration {
     jpaVendorAdapter.setDatabasePlatform(databasePlatform);
     return jpaVendorAdapter;
   }
-
 
 }
