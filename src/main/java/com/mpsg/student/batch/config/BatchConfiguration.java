@@ -2,9 +2,11 @@ package com.mpsg.student.batch.config;
 
 import com.mpsg.student.batch.config.listener.ReaderListener;
 import com.mpsg.student.batch.config.listener.WriteListener;
+import com.mpsg.student.batch.config.processor.StudentProcessor;
 import com.mpsg.student.batch.config.reader.StudentReader;
 import com.mpsg.student.batch.config.writer.StudentWriter;
 import com.mpsg.student.batch.database.entity.StudentDbo;
+import com.mpsg.student.batch.domain.Student;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -45,12 +47,14 @@ public class BatchConfiguration {
                           StudentReader studentReader,
                           StepBuilderFactory stepBuilderFactory,
                           ReaderListener readerListener,
+                          StudentProcessor studentProcessor,
                           WriteListener writeListener,
                           StudentWriter studentWriter) {
     return stepBuilderFactory.get("studentStep")
-      .<StudentDbo, StudentDbo>chunk(chunkSize)
+      .<Student, StudentDbo>chunk(chunkSize)
       .reader(studentReader).faultTolerant().skip(Exception.class).skipLimit(Integer.MAX_VALUE)
       .listener(readerListener)
+      .processor(studentProcessor)
       .writer(studentWriter).faultTolerant().skip(Exception.class).skipLimit(Integer.MAX_VALUE)
       .listener(writeListener)
       .taskExecutor(stepTaskExecutor())
