@@ -2,22 +2,18 @@ package com.mpsg.student.batch.config;
 
 import com.mpsg.student.batch.config.listener.ReaderListener;
 import com.mpsg.student.batch.config.listener.WriteListener;
-import com.mpsg.student.batch.config.reader.mapper.StudentLineMapper;
+import com.mpsg.student.batch.config.reader.StudentReader;
 import com.mpsg.student.batch.config.writer.StudentWriter;
-import com.mpsg.student.batch.entity.Student;
+import com.mpsg.student.batch.database.entity.StudentDbo;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -29,7 +25,6 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import javax.sql.DataSource;
 import java.util.Properties;
 
-@EnableAutoConfiguration
 @EnableBatchProcessing
 @Configuration
 public class BatchConfiguration {
@@ -47,29 +42,19 @@ public class BatchConfiguration {
 
   @Bean
   public Step studentStep(@Value("${batch.configuration.chunkSize}") int chunkSize,
-                          @Qualifier("studentReader") FlatFileItemReader<Student> studentReader,
+                          StudentReader studentReader,
                           StepBuilderFactory stepBuilderFactory,
                           ReaderListener readerListener,
                           WriteListener writeListener,
                           StudentWriter studentWriter) {
     return stepBuilderFactory.get("studentStep")
-      .<Student, Student>chunk(chunkSize)
+      .<StudentDbo, StudentDbo>chunk(chunkSize)
       .reader(studentReader).faultTolerant().skip(Exception.class).skipLimit(Integer.MAX_VALUE)
       .listener(readerListener)
       .writer(studentWriter).faultTolerant().skip(Exception.class).skipLimit(Integer.MAX_VALUE)
       .listener(writeListener)
       .taskExecutor(stepTaskExecutor())
       .throttleLimit(concurrencyLimit)
-      .build();
-  }
-
-  @Bean("studentReader")
-  public FlatFileItemReader<Student> studentReader(StudentLineMapper studentLineMapper,
-                                                   @Value("${batch.file.path}") String filePath) {
-    return new FlatFileItemReaderBuilder<Student>()
-      .name("studentItemReader")
-      .resource(new ClassPathResource(filePath))
-      .lineMapper(studentLineMapper)
       .build();
   }
 
@@ -84,7 +69,7 @@ public class BatchConfiguration {
   public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource,
                                                                      JpaVendorAdapter jpaVendorAdapter) {
     var entityManagerFactory = new LocalContainerEntityManagerFactoryBean();
-    entityManagerFactory.setPackagesToScan("com.mpsg.student.batch.entity");
+    entityManagerFactory.setPackagesToScan("com.mpsg.student.batch.database.entity");
     entityManagerFactory.setDataSource(dataSource);
     entityManagerFactory.setJpaVendorAdapter(jpaVendorAdapter);
     entityManagerFactory.setJpaProperties(new Properties());

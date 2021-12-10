@@ -1,4 +1,4 @@
-package com.mpsg.student.batch.entity;
+package com.mpsg.student.batch.database.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +17,7 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 @Entity
 @Table(name = "student")
-public class Student {
+public class StudentDbo {
 
   @Id
   @GeneratedValue(generator = "UUID")

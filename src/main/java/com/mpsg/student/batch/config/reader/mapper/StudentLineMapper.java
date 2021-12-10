@@ -1,6 +1,6 @@
 package com.mpsg.student.batch.config.reader.mapper;
 
-import com.mpsg.student.batch.entity.Student;
+import com.mpsg.student.batch.database.entity.StudentDbo;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.FixedLengthTokenizer;
@@ -9,12 +9,12 @@ import org.springframework.stereotype.Component;
 import static com.mpsg.student.batch.config.reader.mapper.Positions.*;
 
 @Component
-public class StudentLineMapper implements LineMapper<Student> {
+public class StudentLineMapper implements LineMapper<StudentDbo> {
 
   @Override
-  public Student mapLine(String line, int lineNumber) throws Exception {
-    DefaultLineMapper<Student> mapper = defaultLineMapper();
-    mapper.setFieldSetMapper(fieldSet -> Student
+  public StudentDbo mapLine(String line, int lineNumber) throws Exception {
+    DefaultLineMapper<StudentDbo> mapper = defaultLineMapper();
+    mapper.setFieldSetMapper(fieldSet -> StudentDbo
                                .builder()
                                .firstName(fieldSet.readString(FIRST_NAME.getColumn()))
                                .lastName(fieldSet.readString(LAST_NAME.getColumn()))
@@ -31,8 +31,8 @@ public class StudentLineMapper implements LineMapper<Student> {
     return tokenizer;
   }
 
-  private DefaultLineMapper<Student> defaultLineMapper() {
-    var mapper = new DefaultLineMapper<Student>();
+  private DefaultLineMapper<StudentDbo> defaultLineMapper() {
+    var mapper = new DefaultLineMapper<StudentDbo>();
     mapper.setLineTokenizer(fixedLengthTokenizer());
     return mapper;
   }

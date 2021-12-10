@@ -1,7 +1,7 @@
 package com.mpsg.student.batch.config.writer;
 
-import com.mpsg.student.batch.entity.Student;
-import com.mpsg.student.batch.repository.StudentRepository;
+import com.mpsg.student.batch.database.entity.StudentDbo;
+import com.mpsg.student.batch.database.repository.StudentRepository;
 import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.stereotype.Component;
 
@@ -9,7 +9,7 @@ import javax.persistence.EntityManagerFactory;
 import java.util.List;
 
 @Component
-public class StudentWriter extends JpaItemWriter<Student> {
+public class StudentWriter extends JpaItemWriter<StudentDbo> {
 
   private final StudentRepository repository;
 
@@ -19,7 +19,7 @@ public class StudentWriter extends JpaItemWriter<Student> {
   }
 
   @Override
-  public void write(List<? extends Student> students) {
+  public void write(List<? extends StudentDbo> students) {
     repository.saveAll(students);
   }
 }
