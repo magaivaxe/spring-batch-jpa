@@ -44,8 +44,8 @@ public class BatchConfiguration {
 
   @Bean
   public Step studentStep(@Value("${batch.configuration.chunkSize}") int chunkSize,
-                          StudentReader studentReader,
                           StepBuilderFactory stepBuilderFactory,
+                          StudentReader studentReader,
                           ReaderListener readerListener,
                           StudentProcessor studentProcessor,
                           WriteListener writeListener,
