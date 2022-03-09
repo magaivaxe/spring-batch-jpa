@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static com.mpsg.student.batch.config.reader.mapper.Positions.FIRST_NAME;
-import static com.mpsg.student.batch.config.reader.mapper.Positions.LAST_NAME;
+import static com.mpsg.student.batch.config.importation.reader.mapper.Positions.FIRST_NAME;
+import static com.mpsg.student.batch.config.importation.reader.mapper.Positions.LAST_NAME;
 
 public class GenerateTestFile {
 

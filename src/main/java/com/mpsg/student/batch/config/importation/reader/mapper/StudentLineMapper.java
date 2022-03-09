@@ -1,4 +1,4 @@
-package com.mpsg.student.batch.config.reader.mapper;
+package com.mpsg.student.batch.config.importation.reader.mapper;
 
 import com.mpsg.student.batch.domain.Student;
 import org.springframework.batch.item.file.LineMapper;
@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 
-import static com.mpsg.student.batch.config.reader.mapper.Positions.*;
+import static com.mpsg.student.batch.config.importation.reader.mapper.Positions.*;
 
 @Component
 public class StudentLineMapper implements LineMapper<Student> {

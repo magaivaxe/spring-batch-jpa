@@ -1,4 +1,4 @@
-package com.mpsg.student.batch.config.writer;
+package com.mpsg.student.batch.config.importation.writer;
 
 import com.mpsg.student.batch.database.entity.StudentDbo;
 import com.mpsg.student.batch.database.repository.StudentRepository;
@@ -9,11 +9,11 @@ import javax.persistence.EntityManagerFactory;
 import java.util.List;
 
 @Component
-public class StudentWriter extends JpaItemWriter<StudentDbo> {
+public class ImportStudentWriter extends JpaItemWriter<StudentDbo> {
 
   private final StudentRepository repository;
 
-  public StudentWriter(StudentRepository repository, EntityManagerFactory entityManagerFactory) {
+  public ImportStudentWriter(StudentRepository repository, EntityManagerFactory entityManagerFactory) {
     this.repository = repository;
     super.setEntityManagerFactory(entityManagerFactory);
   }

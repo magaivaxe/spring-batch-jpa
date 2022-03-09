@@ -1,10 +1,10 @@
 package com.mpsg.student.batch.config;
 
-import com.mpsg.student.batch.config.listener.ReaderListener;
-import com.mpsg.student.batch.config.listener.WriteListener;
-import com.mpsg.student.batch.config.processor.StudentProcessor;
-import com.mpsg.student.batch.config.reader.StudentReader;
-import com.mpsg.student.batch.config.writer.StudentWriter;
+import com.mpsg.student.batch.config.importation.listener.ImportReaderListener;
+import com.mpsg.student.batch.config.importation.listener.ImportWriterListener;
+import com.mpsg.student.batch.config.importation.processor.ImportStudentProcessor;
+import com.mpsg.student.batch.config.importation.reader.ImportStudentReader;
+import com.mpsg.student.batch.config.importation.writer.ImportStudentWriter;
 import com.mpsg.student.batch.database.entity.StudentDbo;
 import com.mpsg.student.batch.domain.Student;
 import org.springframework.batch.core.Job;
@@ -33,30 +33,31 @@ public class BatchConfiguration {
 
   @Value("${batch.configuration.concurrencyLimit}")
   private int concurrencyLimit;
+  @Value("${batch.configuration.chunkSize}")
+  private int chunkSize;
 
   @Bean
   public Job studentJob(JobBuilderFactory jobBuilderFactory,
-                        @Qualifier("studentStep") Step studentStep) {
+                        @Qualifier("studentImportStep") Step studentImportStep) {
     return jobBuilderFactory.get("studentJob")
-                            .start(studentStep)
+                            .start(studentImportStep)
                             .build();
   }
 
   @Bean
-  public Step studentStep(@Value("${batch.configuration.chunkSize}") int chunkSize,
-                          StepBuilderFactory stepBuilderFactory,
-                          StudentReader studentReader,
-                          ReaderListener readerListener,
-                          StudentProcessor studentProcessor,
-                          WriteListener writeListener,
-                          StudentWriter studentWriter) {
-    return stepBuilderFactory.get("studentStep")
+  public Step studentImportStep(StepBuilderFactory stepBuilderFactory,
+                          ImportStudentReader importStudentReader,
+                          ImportReaderListener importReaderListener,
+                          ImportStudentProcessor importStudentProcessor,
+                          ImportWriterListener importWriterListener,
+                          ImportStudentWriter importStudentWriter) {
+    return stepBuilderFactory.get("studentImport")
       .<Student, StudentDbo>chunk(chunkSize)
-      .reader(studentReader).faultTolerant().skip(Exception.class).skipLimit(Integer.MAX_VALUE)
-      .listener(readerListener)
-      .processor(studentProcessor)
-      .writer(studentWriter).faultTolerant().skip(Exception.class).skipLimit(Integer.MAX_VALUE)
-      .listener(writeListener)
+      .reader(importStudentReader).faultTolerant().skip(Exception.class).skipLimit(Integer.MAX_VALUE)
+      .listener(importReaderListener)
+      .processor(importStudentProcessor)
+      .writer(importStudentWriter).faultTolerant().skip(Exception.class).skipLimit(Integer.MAX_VALUE)
+      .listener(importWriterListener)
       .taskExecutor(stepTaskExecutor())
       .throttleLimit(concurrencyLimit)
       .build();

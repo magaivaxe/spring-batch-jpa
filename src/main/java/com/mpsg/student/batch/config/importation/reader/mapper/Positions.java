@@ -1,4 +1,4 @@
-package com.mpsg.student.batch.config.reader.mapper;
+package com.mpsg.student.batch.config.importation.reader.mapper;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

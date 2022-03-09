@@ -1,4 +1,4 @@
-package com.mpsg.student.batch.config.listener;
+package com.mpsg.student.batch.config.importation.listener;
 
 import com.mpsg.student.batch.database.entity.StudentDbo;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +9,7 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class WriteListener implements ItemWriteListener<StudentDbo> {
+public class ImportWriterListener implements ItemWriteListener<StudentDbo> {
   @Override
   public void beforeWrite(List<? extends StudentDbo> items) {
   }

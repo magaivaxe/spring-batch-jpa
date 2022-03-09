@@ -1,4 +1,4 @@
-package com.mpsg.student.batch.config.listener;
+package com.mpsg.student.batch.config.importation.listener;
 
 import com.mpsg.student.batch.database.entity.StudentDbo;
 import lombok.extern.slf4j.Slf4j;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class ReaderListener implements ItemReadListener<StudentDbo> {
+public class ImportReaderListener implements ItemReadListener<StudentDbo> {
   @Override
   public void beforeRead() {
   }
