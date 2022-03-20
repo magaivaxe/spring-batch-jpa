@@ -1,4 +1,4 @@
-package com.mpsg.student.batch.config.importation.processor;
+package com.mpsg.student.batch.config.importbatch.processor;
 
 import com.mpsg.student.batch.database.entity.StudentDbo;
 import com.mpsg.student.batch.domain.Student;

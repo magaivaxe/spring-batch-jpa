@@ -1,6 +1,6 @@
-package com.mpsg.student.batch.config.importation.reader;
+package com.mpsg.student.batch.config.importbatch.reader;
 
-import com.mpsg.student.batch.config.importation.reader.mapper.StudentLineMapper;
+import com.mpsg.student.batch.config.importbatch.reader.mapper.StudentLineMapper;
 import com.mpsg.student.batch.domain.Student;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.beans.factory.annotation.Value;

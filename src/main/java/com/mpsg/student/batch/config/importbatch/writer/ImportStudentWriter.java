@@ -1,4 +1,4 @@
-package com.mpsg.student.batch.config.importation.writer;
+package com.mpsg.student.batch.config.importbatch.writer;
 
 import com.mpsg.student.batch.database.entity.StudentDbo;
 import com.mpsg.student.batch.database.repository.StudentRepository;

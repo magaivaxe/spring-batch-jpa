@@ -7,9 +7,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class ApplicationTests extends Assertions {
 
-	@Test
-	void contextLoads() {
-		assertThat(1).isEqualTo(1);
-	}
+  @Test
+  void contextLoads() {
+    assertThat(1).isEqualTo(1);
+  }
 
 }
